@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌟三年级英语单词乐园🌟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(180deg, #FFEFF1, #E8F4FF);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 3px solid #FFD6E0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 26px;
+            color: #FF6B8B;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px #FFE0E6;
+            margin-bottom: 8px;
+        }
+
+        .sub-title {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .score-box {
+            background: linear-gradient(90deg, #FFD6E0, #E0F0FF);
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #FF5470;
+            font-weight: bold;
+        }
+
+        .game-card {
+            background: #FAFCFF;
+            border-radius: 20px;
+            padding: 25px 20px;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            border: 2px dashed #C0E2FF;
+        }
+
+        .question {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4A90E2;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-book1 { background: #FF9AAA; }
+        .btn-book2 { background: #72CCFF; }
+        .btn-mode1 { background: #FF9AAA; }
+        .btn-mode2 { background: #72CCFF; }
+        .btn-mode3 { background: #62D99B; }
+        .btn-answer { background: #4A90E2; }
+        .btn-speak { background: #FF9500; margin-top: 10px; padding: 10px; }
+
+        .tip {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        .correct { background: #4CD964 !important; }
+        .wrong { background: #FF3B30 !important; }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">🌟 单词乐园 🌟</div>
+            <div class="sub-title">湘少版小学英语三年级</div>
+        </div>
+
+        <div class="score-box">🏆 得分：<span id="score">0</span></div>
+
+        <!-- 选择册数 -->
+        <div id="bookPage" class="game-card">
+            <div class="question">选择单词册</div>
+            <button class="btn btn-book1" onclick="selectBook(1)">📕 三年级上册</button>
+            <button class="btn btn-book2" onclick="selectBook(2)">📘 三年级下册</button>
+        </div>
+
+        <!-- 选择模式 -->
+        <div id="modePage" class="game-card hide">
+            <div class="question">选择游戏模式</div>
+            <button class="btn btn-mode1" onclick="startMode(1)">🔊 听音选单词</button>
+            <button class="btn btn-mode2" onclick="startMode(2)">🖼️ 看图认单词</button>
+            <button class="btn btn-mode3" onclick="startMode(3)">✍️ 英汉小配对</button>
+            <button class="btn" onclick="backToBook()">↩️ 返回选书</button>
+        </div>
+
+        <!-- 游戏页面 -->
+        <div id="gamePage" class="game-card hide">
+            <div id="questionText"></div>
+            <button class="btn btn-speak" onclick="speakNow()">🔊 点击听发音</button>
+            <button class="btn btn-answer" onclick="ans(1)"></button>
+            <button class="btn btn-answer" onclick="ans(2)"></button>
+            <button class="btn btn-answer" onclick="ans(3)"></button>
+            <button class="btn btn-answer" onclick="ans(4)"></button>
+            <button class="btn" onclick="backToMode()">↩️ 返回模式</button>
+        </div>
+
+        <div class="tip">✅ 适配手机 / 思必驰办公本 全屏学习</div>
+    </div>
+
+    <script>
+        // ===================== 单词库 =====================
+        const words = {
+            book1: [
+                {"en": "welcome", "cn": "欢迎", "icon": "🫂"}, {"en": "to", "cn": "向，到，往（用于动词、名词或形容词后）", "icon": "↗️"}, {"en": "school", "cn": "学校", "icon": "🏫"}, {"en": "hi", "cn": "嘿，喂，你好", "icon": "👋"}, {"en": "I", "cn": "我", "icon": "👤"}, {"en": "be", "cn": "是", "icon": "🪄"}, {"en": "what", "cn": "什么", "icon": "❓"}, {"en": "your", "cn": "你的；你们的", "icon": "🧑"}, {"en": "name", "cn": "名字", "icon": "🏷️"}, {"en": "hello", "cn": "喂，哈啰，你好", "icon": "👋"}, {"en": "my", "cn": "我的", "icon": "📌"}, {"en": "goodbye", "cn": "再见", "icon": "👋"}, {"en": "have", "cn": "有，拥有", "icon": "👜"}, {"en": "a (an)", "cn": "一（个）", "icon": "1️⃣"}, {"en": "nice", "cn": "令人愉快的", "icon": "😊"}, {"en": "day", "cn": "一天", "icon": "📅"}, {"en": "good", "cn": "好的", "icon": "👍"}, {"en": "morning", "cn": "早晨，上午", "icon": "🌅"}, {"en": "Ms", "cn": "女士", "icon": "👩"}, {"en": "stand", "cn": "站立", "icon": "🧍"}, {"en": "stand up", "cn": "站起来", "icon": "⬆️"}, {"en": "sit", "cn": "坐", "icon": "🪑"}, {"en": "sit down", "cn": "坐下", "icon": "⬇️"}, {"en": "open", "cn": "打开", "icon": "🔓"}, {"en": "book", "cn": "书", "icon": "📖"}, {"en": "close", "cn": "合上", "icon": "🔒"}, {"en": "point", "cn": "指", "icon": "☝️"}, {"en": "say", "cn": "说", "icon": "🗣️"}, {"en": "read", "cn": "阅读", "icon": "📚"}, {"en": "listen", "cn": "听", "icon": "👂"}, {"en": "write", "cn": "写", "icon": "✍️"}, {"en": "let's (let us)", "cn": "让我们", "icon": "🤝"}, {"en": "friend", "cn": "朋友", "icon": "👭"}, {"en": "meet", "cn": "认识，结识", "icon": "🤝"}, {"en": "you", "cn": "你；你们", "icon": "👉"}, {"en": "play", "cn": "玩，玩耍", "icon": "🎮"}, {"en": "happy", "cn": "高兴的，快乐的", "icon": "😄"}, {"en": "new", "cn": "新的", "icon": "🆕"}, {"en": "do", "cn": "做；构成疑问或否定句", "icon": "🛠️"}, {"en": "they", "cn": "他们", "icon": "👥"}, {"en": "everyone", "cn": "每个人，人人", "icon": "👥"}, {"en": "nine", "cn": "九", "icon": "9️⃣"}, {"en": "she", "cn": "她", "icon": "👩"}, {"en": "too", "cn": "也", "icon": "➕"}, {"en": "we", "cn": "我们", "icon": "🧑🤝🧑"}, {"en": "from", "cn": "从", "icon": "🏠"}, {"en": "the", "cn": "用于已知、唯一或特指的人或物", "icon": "📌"}, {"en": "twin", "cn": "双胞胎中的一个", "icon": "🥸"}, {"en": "he", "cn": "他", "icon": "👨"}, {"en": "come", "cn": "来；来到", "icon": "⬅️"}, {"en": "and", "cn": "然后，接着；和", "icon": "➕"}, {"en": "oh", "cn": "噢", "icon": "🙂"}, {"en": "no", "cn": "不，不行", "icon": "❌"}, {"en": "help", "cn": "帮助，帮忙", "icon": "🙋"}, {"en": "here", "cn": "在这里", "icon": "📍"}, {"en": "here you are", "cn": "给你", "icon": "🤲"}, {"en": "thank", "cn": "感谢", "icon": "🙏"}, {"en": "together", "cn": "一起，一块儿", "icon": "👫"}, {"en": "OK", "cn": "行，可以", "icon": "🆗"}, {"en": "great", "cn": "极棒的，极好的", "icon": "🌟"}, {"en": "song", "cn": "歌曲", "icon": "🎵"}, {"en": "dear", "cn": "亲爱的", "icon": "💌"}, {"en": "sing", "cn": "唱，歌唱", "icon": "🎤"}, {"en": "now", "cn": "现在", "icon": "🕐"}, {"en": "know", "cn": "认识；知道", "icon": "🧠"}, {"en": "our", "cn": "我们的", "icon": "👨‍👩‍👧‍👦"}, {"en": "everybody", "cn": "每个人，人人", "icon": "👥"}, {"en": "with", "cn": "和……一起", "icon": "🤝"}, {"en": "me", "cn": "我", "icon": "👤"}, {"en": "thing", "cn": "东西", "icon": "🧸"}, {"en": "pack", "cn": "收拾好", "icon": "🎒"}, {"en": "pen", "cn": "钢笔", "icon": "🖊️"}, {"en": "pencil", "cn": "铅笔", "icon": "✏️"}, {"en": "pencil case", "cn": "笔袋；铅笔盒", "icon": "✏️📦"}, {"en": "bag", "cn": "袋；包", "icon": "👜"}, {"en": "for", "cn": "为了", "icon": "🎯"}, {"en": "ruler", "cn": "尺子", "icon": "📏"}, {"en": "eraser", "cn": "橡皮", "icon": "🧽"}, {"en": "this", "cn": "这，这个", "icon": "📍"}, {"en": "in", "cn": "在……里", "icon": "📦"}, {"en": "schoolbag", "cn": "书包", "icon": "🎒"}, {"en": "it", "cn": "它", "icon": "🧸"}, {"en": "not", "cn": "不，不是", "icon": "🚫"}, {"en": "that", "cn": "那，那个", "icon": "👉"}, {"en": "yes", "cn": "是，对", "icon": "✅"}, {"en": "guess", "cn": "猜，猜测", "icon": "🤔"}, {"en": "find", "cn": "发现，找到", "icon": "🔍"}, {"en": "lost and found", "cn": "失物招领", "icon": "📢"}, {"en": "bye", "cn": "再见", "icon": "👋"}, {"en": "kid", "cn": "小孩，儿童", "icon": "🧒"}, {"en": "take care of", "cn": "照看", "icon": "👀"}, {"en": "there", "cn": "在那里", "icon": "🗺️"}, {"en": "please", "cn": "请", "icon": "🙏"}, {"en": "back", "cn": "回到原处", "icon": "↩️"}, {"en": "come back", "cn": "回来", "icon": "↩️🏠"}, {"en": "look", "cn": "看，瞧", "icon": "👀"}, {"en": "look at", "cn": "看某人/某物", "icon": "👀"}, {"en": "colourful", "cn": "颜色鲜艳的", "icon": "🌈"}, {"en": "world", "cn": "世界", "icon": "🌍"}, {"en": "hooray", "cn": "好哇", "icon": "🎉"}, {"en": "umbrella", "cn": "雨伞", "icon": "☂️"}, {"en": "clothes", "cn": "衣服", "icon": "👕"}, {"en": "red", "cn": "红色", "icon": "🔴"}, {"en": "pink", "cn": "粉红色", "icon": "🌸"}, {"en": "green", "cn": "绿色", "icon": "🟢"}, {"en": "yellow", "cn": "黄色", "icon": "🟡"}, {"en": "orange", "cn": "橙色", "icon": "🟠"}, {"en": "blue", "cn": "蓝色", "icon": "🔵"}, {"en": "purple", "cn": "紫色", "icon": "🟣"}, {"en": "rainbow", "cn": "彩虹", "icon": "🌈"}, {"en": "want", "cn": "想要", "icon": "🤲"}, {"en": "balloon", "cn": "气球", "icon": "🎈"}, {"en": "colour", "cn": "颜色", "icon": "🎨"}, {"en": "can", "cn": "能，会", "icon": "✅"}, {"en": "see", "cn": "看见", "icon": "👁️"}, {"en": "right", "cn": "正确的", "icon": "✅"}, {"en": "first", "cn": "第一的", "icon": "🥇"}, {"en": "magical", "cn": "神奇的", "icon": "🧙"}, {"en": "fun", "cn": "有趣的", "icon": "😄"}, {"en": "black", "cn": "黑色", "icon": "⚫"}, {"en": "so", "cn": "这么，如此", "icon": "↔️"}, {"en": "many", "cn": "许多", "icon": "📊"}, {"en": "picture", "cn": "图画", "icon": "🖼️"}, {"en": "today", "cn": "今天", "icon": "📅"}, {"en": "paint", "cn": "画，作画", "icon": "🖌️"}, {"en": "number", "cn": "数，数字", "icon": "🔢"}, {"en": "count", "cn": "数数", "icon": "🧮"}, {"en": "how", "cn": "多少；怎样", "icon": "❓"}, {"en": "bird", "cn": "鸟", "icon": "🐦"}, {"en": "one", "cn": "一", "icon": "1️⃣"}, {"en": "two", "cn": "二", "icon": "2️⃣"}, {"en": "three", "cn": "三", "icon": "3️⃣"}, {"en": "four", "cn": "四", "icon": "4️⃣"}, {"en": "five", "cn": "五", "icon": "5️⃣"}, {"en": "six", "cn": "六", "icon": "6️⃣"}, {"en": "seven", "cn": "七", "icon": "7️⃣"}, {"en": "eight", "cn": "八", "icon": "8️⃣"}, {"en": "ten", "cn": "十", "icon": "🔟"}, {"en": "eleven", "cn": "十一", "icon": "11"}, {"en": "twelve", "cn": "十二", "icon": "12"}, {"en": "rope", "cn": "绳", "icon": "🧵"}, {"en": "who", "cn": "谁", "icon": "👤"}, {"en": "make", "cn": "制作", "icon": "🔨"}, {"en": "Chinese knot", "cn": "中国结", "icon": "🇨🇳"}, {"en": "beautiful", "cn": "美丽的", "icon": "💎"}, {"en": "only", "cn": "仅仅", "icon": "🔒"}, {"en": "show", "cn": "给……看", "icon": "📺"}, {"en": "baby", "cn": "幼崽；雏鸟", "icon": "👶"}, {"en": "cheep", "cn": "吱吱声", "icon": "🐦"}, {"en": "egg", "cn": "蛋", "icon": "🥚"}, {"en": "hungry", "cn": "饥饿的", "icon": "🍽️"}, {"en": "around", "cn": "环绕", "icon": "🔁"}, {"en": "all", "cn": "全部，所有", "icon": "✨"}, {"en": "all around", "cn": "处处，到处", "icon": "🌍"}, {"en": "big", "cn": "大的", "icon": "🐘"}, {"en": "little", "cn": "小的", "icon": "🐭"}, {"en": "everywhere", "cn": "处处", "icon": "📍"}, {"en": "family", "cn": "家庭；家人", "icon": "👨‍👩‍👧‍👦"}, {"en": "dad", "cn": "爸爸", "icon": "👨"}, {"en": "mum", "cn": "妈妈", "icon": "👩"}, {"en": "brother", "cn": "哥哥；弟弟", "icon": "👦"}, {"en": "sister", "cn": "姐姐；妹妹", "icon": "👧"}, {"en": "grandpa", "cn": "祖父；外祖父", "icon": "👴"}, {"en": "grandma", "cn": "祖母；外祖母", "icon": "👵"}, {"en": "but", "cn": "但是", "icon": "🛑"}, {"en": "people", "cn": "人；人们", "icon": "🧑‍🤝‍🧑"}, {"en": "story", "cn": "故事", "icon": "📖"}, {"en": "cap", "cn": "帽子", "icon": "🧢"}, {"en": "worry", "cn": "担心", "icon": "😟"}, {"en": "on", "cn": "在……上面", "icon": "⬆️"}, {"en": "come on", "cn": "快点；加油", "icon": "💪"}, {"en": "photo", "cn": "照片", "icon": "📷"}, {"en": "love", "cn": "爱，关爱", "icon": "❤️"}, {"en": "daddy", "cn": "爸爸", "icon": "👨"}, {"en": "mummy", "cn": "妈妈", "icon": "👩"}, {"en": "where", "cn": "在哪里", "icon": "🗺️"}, {"en": "dog", "cn": "狗", "icon": "🐕"}, {"en": "box", "cn": "盒；箱", "icon": "📦"}, {"en": "sweet", "cn": "甜蜜的", "icon": "🍯"}, {"en": "home", "cn": "家", "icon": "🏠"}, {"en": "game", "cn": "游戏", "icon": "🎮"}, {"en": "room", "cn": "房间", "icon": "🚪"}, {"en": "living room", "cn": "客厅", "icon": "🛋️"}, {"en": "bedroom", "cn": "卧室", "icon": "🛏️"}, {"en": "bathroom", "cn": "浴室，卫生间", "icon": "🚽"}, {"en": "kitchen", "cn": "厨房", "icon": "🍳"}, {"en": "dining room", "cn": "餐厅", "icon": "🍽️"}, {"en": "door", "cn": "门", "icon": "🚪"}, {"en": "chair", "cn": "椅子", "icon": "🪑"}, {"en": "think", "cn": "想，认为", "icon": "🧠"}, {"en": "under", "cn": "在……下面", "icon": "⬇️"}, {"en": "bed", "cn": "床", "icon": "🛏️"}, {"en": "toy", "cn": "玩具", "icon": "🧸"}, {"en": "miaow", "cn": "喵", "icon": "🐱"}, {"en": "table", "cn": "桌子", "icon": "🪑"}, {"en": "cat", "cn": "猫", "icon": "🐈"}, {"en": "ball", "cn": "球", "icon": "⚽"}, {"en": "their", "cn": "他们的", "icon": "👨‍👩‍👧‍👦"}, {"en": "apple", "cn": "苹果", "icon": "🍎"}, {"en": "share", "cn": "分享", "icon": "🤲"}, {"en": "put", "cn": "放", "icon": "📥"}, {"en": "cooking", "cn": "做饭", "icon": "👩‍🍳"}, {"en": "sun", "cn": "太阳", "icon": "☀️"}, {"en": "like", "cn": "喜欢", "icon": "👍"}, {"en": "run", "cn": "跑", "icon": "🏃"}, {"en": "lucky", "cn": "幸运的", "icon": "🍀"}
+            ],
+            book2: [
+                {en:"one",cn:"一",icon:"1️⃣"},
+                {en:"two",cn:"二",icon:"2️⃣"},
+                {en:"three",cn:"三",icon:"3️⃣"},
+                {en:"four",cn:"四",icon:"4️⃣"},
+                {en:"five",cn:"五",icon:"5️⃣"},
+                {en:"six",cn:"六",icon:"6️⃣"},
+                {en:"seven",cn:"七",icon:"7️⃣"},
+                {en:"eight",cn:"八",icon:"8️⃣"},
+                {en:"nine",cn:"九",icon:"9️⃣"},
+                {en:"ten",cn:"十",icon:"🔟"},
+                {en:"father",cn:"爸爸",icon:"👨"},
+                {en:"mother",cn:"妈妈",icon:"👩"},
+                {en:"sister",cn:"姐妹",icon:"👧"},
+                {en:"brother",cn:"兄弟",icon:"👦"},
+                {en:"grandpa",cn:"爷爷/外公",icon:"👴"},
+                {en:"grandma",cn:"奶奶/外婆",icon:"👵"},
+                {en:"friend",cn:"朋友",icon:"👫"},
+                {en:"desk",cn:"课桌",icon:"🪑"},
+                {en:"chair",cn:"椅子",icon:"🪑"},
+                {en:"window",cn:"窗户",icon:"🪟"},
+                {en:"door",cn:"门",icon:"🚪"},
+                {en:"ball",cn:"球",icon:"⚽"},
+                {en:"kite",cn:"风筝",icon:"🪁"},
+                {en:"toy",cn:"玩具",icon:"🧸"},
+                {en:"car",cn:"小汽车",icon:"🚗"},
+                {en:"bus",cn:"公共汽车",icon:"🚌"},
+                {en:"bike",cn:"自行车",icon:"🚲"},
+                {en:"taxi",cn:"出租车",icon:"🚕"},
+                {en:"ship",cn:"船",icon:"🚢"},
+                {en:"plane",cn:"飞机",icon:"✈"},
+                {en:"train",cn:"火车",icon:"🚆"}
+            ]
+        };
+
+        let currentBook = 1;
+        let currentMode = 0;
+        let nowWord;
+        let options = [];
+        let score = 0;
+        const btnAns = document.querySelectorAll(".btn-answer");
+
+        // 随机数
+        function r(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // 打乱
+        function shuffle(arr) {
+            return arr.sort(() => Math.random() - 0.5);
+        }
+
+        // 发音
+        function speakNow() {
+            if(nowWord){
+                let u = new SpeechSynthesisUtterance();
+                u.text = nowWord.en;
+                u.lang = "en-US";
+                u.rate = 0.9;
+                speechSynthesis.speak(u);
+            }
+        }
+
+        // 选择书本
+        function selectBook(b) {
+            currentBook = b;
+            document.getElementById("bookPage").classList.add("hide");
+            document.getElementById("modePage").classList.remove("hide");
+        }
+
+        // 开始模式
+        function startMode(m) {
+            currentMode = m;
+            document.getElementById("modePage").classList.add("hide");
+            document.getElementById("gamePage").classList.remove("hide");
+            nextQuestion();
+        }
+
+        // 下一题
+        function nextQuestion() {
+            let list = currentBook == 1 ? words.book1 : words.book2;
+            nowWord = list[r(0, list.length - 1)];
+            options = [nowWord];
+            while (options.length < 4) {
+                let w = list[r(0, list.length - 1)];
+                if (!options.includes(w)) options.push(w);
+            }
+            options = shuffle(options);
+            showQuestion();
+        }
+
+        // 显示题目
+        function showQuestion() {
+            const q = document.getElementById("questionText");
+            btnAns.forEach(b => b.classList.remove("correct", "wrong"));
+
+            if (currentMode === 1) {
+                q.innerHTML = `🔊 请听：${nowWord.en}`;
+                btnAns.forEach((b, i) => b.innerHTML = options[i].cn);
+            } else if (currentMode === 2) {
+                q.innerHTML = `${nowWord.icon} 对应的单词是？`;
+                btnAns.forEach((b, i) => b.innerHTML = options[i].en);
+            } else {
+                q.innerHTML = `中文：${nowWord.cn}`;
+                btnAns.forEach((b, i) => b.innerHTML = options[i].en);
+            }
+        }
+
+        // 答题
+        function ans(idx) {
+            const btn = btnAns[idx - 1];
+            let ok = false;
+
+            if (currentMode === 1) {
+                ok = options[idx - 1].cn === nowWord.cn;
+            } else {
+                ok = options[idx - 1].en === nowWord.en;
+            }
+
+            if (ok) {
+                btn.classList.add("correct");
+                score += 10;
+                document.getElementById("score").innerText = score;
+                setTimeout(() => nextQuestion(), 400);
+            } else {
+                btn.classList.add("wrong");
+                setTimeout(() => btn.classList.remove("wrong"), 300);
+            }
+        }
+
+        // 返回
+        function backToMode() {
+            document.getElementById("gamePage").classList.add("hide");
+            document.getElementById("modePage").classList.remove("hide");
+        }
+
+        function backToBook() {
+            document.getElementById("modePage").classList.add("hide");
+            document.getElementById("bookPage").classList.remove("hide");
+            score = 0;
+            document.getElementById("score").innerText = 0;
+        }
+    </script>
+</body>
+</html>
